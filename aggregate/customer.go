@@ -2,8 +2,8 @@
 package aggregate
 
 import (
-	"github.com/rawsashimi1604/ddd-go/entity"
-	"github.com/rawsashimi1604/ddd-go/valueobject"
+	"github.com/rawsashimi1604/go-ddd/entity"
+	"github.com/rawsashimi1604/go-ddd/valueobject"
 )
 
 type Customer struct {

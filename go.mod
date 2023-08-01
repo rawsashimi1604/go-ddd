@@ -1,4 +1,4 @@
-module github.com/rawsashimi1604/ddd-go
+module github.com/rawsashimi1604/go-ddd
 
 go 1.20
 
