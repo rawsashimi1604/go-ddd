@@ -1,6 +1,7 @@
 package services
 
 import (
+	// "context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -11,6 +12,7 @@ func Test_Tavern(t *testing.T) {
 	products := initProducts(t)
 
 	os, err := NewOrderService(
+		// WithMongoCustomerRepository(context.Background(), "mongodb://localhost:27017"),
 		WithMemoryCustomerRepository(),
 		WithMemoryProductRepository(products),
 	)
