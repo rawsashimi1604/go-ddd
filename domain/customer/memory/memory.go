@@ -10,18 +10,18 @@ import (
 	"github.com/rawsashimi1604/go-ddd/domain/customer"
 )
 
-type MemoryRepository struct {
+type MemoryCustomerRepository struct {
 	customers map[uuid.UUID]aggregate.Customer
 	sync.Mutex
 }
 
-func New() *MemoryRepository {
-	return &MemoryRepository{
+func New() *MemoryCustomerRepository {
+	return &MemoryCustomerRepository{
 		customers: make(map[uuid.UUID]aggregate.Customer, 0),
 	}
 }
 
-func (mr *MemoryRepository) Get(id uuid.UUID) (aggregate.Customer, error) {
+func (mr *MemoryCustomerRepository) Get(id uuid.UUID) (aggregate.Customer, error) {
 	if customer, ok := mr.customers[id]; ok {
 		return customer, nil
 	}
@@ -29,7 +29,7 @@ func (mr *MemoryRepository) Get(id uuid.UUID) (aggregate.Customer, error) {
 	return aggregate.Customer{}, customer.ErrCustomerNotFound
 }
 
-func (mr *MemoryRepository) Add(c aggregate.Customer) error {
+func (mr *MemoryCustomerRepository) Add(c aggregate.Customer) error {
 	if mr.customers == nil {
 		mr.Lock()
 		mr.customers = make(map[uuid.UUID]aggregate.Customer)
@@ -46,7 +46,7 @@ func (mr *MemoryRepository) Add(c aggregate.Customer) error {
 	return nil
 }
 
-func (mr *MemoryRepository) Update(c aggregate.Customer) error {
+func (mr *MemoryCustomerRepository) Update(c aggregate.Customer) error {
 	if _, ok := mr.customers[c.GetID()]; !ok {
 		return fmt.Errorf("customer does not exist: %w", customer.ErrUpdateCustomer)
 	}

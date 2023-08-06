@@ -6,14 +6,18 @@ import (
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/rawsashimi1604/go-ddd/aggregate"
 	"github.com/rawsashimi1604/go-ddd/domain/customer"
 	"github.com/rawsashimi1604/go-ddd/domain/customer/memory"
+	"github.com/rawsashimi1604/go-ddd/domain/product"
+	prodmem "github.com/rawsashimi1604/go-ddd/domain/product/memory"
 )
 
 type OrderConfiguration func(os *OrderService) error
 
 type OrderService struct {
 	customers customer.CustomerRepository
+	products  product.ProductRepository
 }
 
 func NewOrderService(cfgs ...OrderConfiguration) (*OrderService, error) {
@@ -43,6 +47,21 @@ func WithMemoryCustomerRepository() OrderConfiguration {
 	return WithCustomerRepository(cr)
 }
 
+func WithMemoryProductRepository(products []aggregate.Product) OrderConfiguration {
+	return func(os *OrderService) error {
+		pr := prodmem.New()
+
+		for _, p := range products {
+			if err := pr.Add(p); err != nil {
+				return err
+			}
+		}
+
+		os.products = pr
+		return nil
+	}
+}
+
 func (o *OrderService) CreateOrder(customerID uuid.UUID, productIDs []uuid.UUID) error {
 	// Fetch the customer
 	c, err := o.customers.Get(customerID)
@@ -50,7 +69,20 @@ func (o *OrderService) CreateOrder(customerID uuid.UUID, productIDs []uuid.UUID)
 		return err
 	}
 
-	// Need to create ProductRepository and product aggregate.
-	log.Println(c)
+	// Get each product
+	var products []aggregate.Product
+	var totalPrice float64
+
+	for _, id := range productIDs {
+		p, err := o.products.GetByID(id)
+
+		if err != nil {
+			return err
+		}
+
+		products = append(products, p)
+		totalPrice += p.GetPrice()
+	}
+	log.Printf("Customer: %s has ordered %d products. The total price is $%v.", c.GetID(), len(products), totalPrice)
 	return nil
 }
